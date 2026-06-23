@@ -1,0 +1,142 @@
+import { isArray, isBoolean, isString } from '@vvi/is';
+import { dog } from '../utils/dog';
+import { getMaxRows } from './getMaxRows';
+import { parseData } from './parseData';
+import {
+  DataType,
+  SelectionParamDataMapType,
+  SelectionParamDataType,
+} from './types';
+
+/** 默认语言  */
+const info = '请使用键盘选择，请使用 Enter 键进行选择',
+  falseValue = false,
+  zeroValue = 0,
+  defaultKind = 'radio';
+
+/**  数据仓库  */
+const data: DataType<PropertyKey> = {
+  drawData: [],
+  info,
+  focus: zeroValue,
+  renderInfo: {
+    rows: 0,
+    renderRows: 0,
+    otherInfoRows: 0,
+    allowBelow: false,
+    size: {
+      width: 0,
+      height: 0,
+    },
+  },
+  resultText: '',
+  errorText: '',
+  private: falseValue,
+  required: falseValue,
+  kind: defaultKind,
+  canCtrlCExit: falseValue,
+  canCtrlDExit: falseValue,
+  mustInfo: falseValue,
+  maxRows: getMaxRows(),
+  data: [],
+  initData<T extends PropertyKey>(params: SelectionParamDataType<T>): boolean {
+    dog('初始化数据');
+    // 清理旧的数据
+    this.reset();
+    /**
+     * 使用参数为 `string` 或 `number` 的数组时
+     *
+     * `data` 使用参数，而其他值
+     */
+    if (isArray(params)) {
+      this.data = parseData(params);
+    } else {
+      (
+        Object.keys(params) as (keyof SelectionParamDataMapType<T> | 'kind')[]
+      ).forEach(currentKey => {
+        const v = params[currentKey as never];
+        switch (currentKey) {
+          case 'data':
+            this.data = isArray(v) ? parseData(v) : [];
+            break;
+          case 'info':
+            this.info = isString(v) ? v : info;
+            break;
+          case 'resultText':
+            this.resultText = isString(v) ? v : this.info || '';
+            break;
+          case 'errorText':
+            this.errorText = isString(v)
+              ? v
+              : this.resultText || this.info || '';
+            break;
+          case 'private':
+            this.private = isBoolean(v) ? v : falseValue;
+            break;
+          case 'required':
+            this.required = isBoolean(v) ? v : falseValue;
+            break;
+          case 'kind':
+            this.kind = v === 'check' ? 'check' : defaultKind;
+            break;
+          case 'canCtrlCExit':
+            this.canCtrlCExit = isBoolean(v) ? v : falseValue;
+            break;
+          case 'canCtrlDExit':
+            this.canCtrlDExit = isBoolean(v) ? v : falseValue;
+            break;
+          case 'maxRows':
+            this.maxRows =
+              isFinite(v) && Number.isInteger(v) && v > 0
+                ? v + 4
+                : getMaxRows();
+        }
+      });
+    }
+    const data = this.data;
+
+    for (const i in data) {
+      const ele = data[i];
+      if (!ele.disable) {
+        this.focus = Number(i); // 初始化首选项
+        return false;
+      }
+    }
+
+    // 没有可用值直接返回
+    return true;
+  },
+  reset() {
+    // 需要重置为 0 的变量
+    this.drawData.length = this.data.length = this.focus = zeroValue;
+    // 可绘制的最大数
+    this.maxRows = getMaxRows();
+    // 绘制的数据
+    this.renderInfo = {
+      rows: 0,
+      renderRows: 0,
+      otherInfoRows: 0,
+      allowBelow: false,
+      size: {
+        width: 0,
+        height: 0,
+      },
+    };
+    // 提示信息
+    this.info = info;
+    // 默认类型
+    this.kind = defaultKind;
+    // 结果展示文本
+    this.resultText = this.errorText = '';
+    // 现在默认缺省值为 true
+    this.private = true;
+    // 需要重置为 false 的变量
+    this.required =
+      this.canCtrlCExit =
+      this.canCtrlDExit =
+      this.mustInfo =
+        falseValue;
+  },
+};
+
+export { data as selectionData };

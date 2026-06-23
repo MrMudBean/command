@@ -1,0 +1,56 @@
+/**
+ * @author Mr.MudBean <Mr.MudBean@outlook.com>
+ * @file index.ts
+ * @since 04/08/2025
+ * @description 解析用户行为
+ */
+import { _p } from '@vvi/node';
+import { AuxiliaryData } from '../auxiliaryData';
+
+import { paringUserArgs } from './paringUserArgs';
+
+/**
+ * # 开始执行 run ，解析绑定数据
+ * @param auxiliaryData
+ */
+export function executeParsing(auxiliaryData: AuxiliaryData) {
+  switch (auxiliaryData.state.code) {
+    case 3:
+      _p('已经执行过 `run`');
+      return;
+    case 4:
+      _p('已完成全部');
+      return;
+    default:
+      auxiliaryData.state = 3;
+  }
+
+  // 解析用户行为
+  paringUserArgs(auxiliaryData);
+
+  // 冷冻数据
+  beforeRun(auxiliaryData);
+}
+
+/**
+ * # 执行冷冻数据
+ * @param auxiliaryData
+ */
+function beforeRun(auxiliaryData: AuxiliaryData) {
+  ['name', 'originBind', 'abbr'].forEach((currentEle: string) => {
+    // 进行格式转化
+    const currentValue = currentEle as never as keyof AuxiliaryData;
+    // 判断是否存在该值
+    if (auxiliaryData[currentValue]) {
+      // 执行数据冷冻
+      Object.freeze(auxiliaryData[currentValue]);
+      // 将数据添加到辅助数据中并冻结
+      Object.defineProperty(auxiliaryData, currentEle, {
+        value: auxiliaryData[currentValue],
+        writable: false,
+        enumerable: true,
+        configurable: false,
+      });
+    }
+  });
+}

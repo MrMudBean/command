@@ -10,7 +10,7 @@ export default {
   input: './eg/index.ts',
   output: {
     format: 'es',
-    entryFileNames: '[name].mjs',
+    entryFileNames: '[name].js',
     preserveModules: false,
     sourcemap: false,
     exports: 'named',

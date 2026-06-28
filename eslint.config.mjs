@@ -11,7 +11,7 @@ import unusedImportsPlugin from 'eslint-plugin-unused-imports'; // 可选：删�
 
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-  
+
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const tsconfigPath = resolve(__dirname, 'tsconfig.types.json');
 
@@ -34,7 +34,7 @@ const ignorePattern = [
 ];
 
 export default [
-   // 0. 忽略文件配置
+  // 0. 忽略文件配置
   {
     ignores: ignorePattern, // 优先配置忽略规则，提升性能
   },
@@ -126,7 +126,7 @@ export default [
     },
   })),
 
-  // 3. 可选：JSDoc 注释规范 
+  // 3. 可选：JSDoc 注释规范
   {
     files: ['**/*.{js,ts,jsx,tsx}'],
     plugins: {
@@ -145,11 +145,10 @@ export default [
       ],
       'jsdoc/check-types': 'error',
 
-      
-        // TypeScript 适配规则
-        'jsdoc/no-types': 'error',
-        'jsdoc/require-param-type': 'off', // 使用 TS 类型
-        'jsdoc/require-returns-type': 'off', // 使用 TS 类型
+      // TypeScript 适配规则
+      'jsdoc/no-types': 'error',
+      'jsdoc/require-param-type': 'off', // 使用 TS 类型
+      'jsdoc/require-returns-type': 'off', // 使用 TS 类型
 
       // 文档质量规则
       'jsdoc/require-description': [
@@ -171,9 +170,9 @@ export default [
     },
   },
 
+  // 4. 关闭 Prettier 冲突规则（必须，用 Prettier 时）
+  prettierConfig,
 
-   // 4. 关闭 Prettier 冲突规则（必须，用 Prettier 时）
-  eslintConfigPrettier,
   //  5 文件特定覆盖
   {
     files: ['**/*.test.js', '**/*.spec.js'],
